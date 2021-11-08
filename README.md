@@ -1,5 +1,8 @@
 spaTyper documentation
 =======
+
+**This service is under construction**
+
 The spaTyper servide predicts the _Staphylococcus aureus_ spa type.
 This version is spaTyper 1.0.
 
@@ -21,8 +24,8 @@ Setting up spaTyper
 cd /path/to/some/dir
 
 # Clone the latest version and enter the resfinder directory
-git clone https://git@bitbucket.org/genomicepidemiology/spaTyper.git
-cd spaTyper
+git clone https://git@bitbucket.org/genomicepidemiology/spatyper.git
+cd spatyper
 
 ```
 
