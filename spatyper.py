@@ -70,6 +70,7 @@ class spatype():
         print("#")
         proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL).wait()
         print("BLAST call ended")
+        print("#")
         
     def filter_spatype(self):
         """
@@ -79,6 +80,8 @@ class spatype():
         q. start == 1 and q. end == 1
         Outputs a temporary tab-separated file with hits.
         """
+        print("# Filtering BLAST hits")
+        print("#")
         with open(outdir + "/hits.tab", "w") as out:
             with open(outdir + "/blastn_out.tab", "r") as f:
                 
@@ -96,21 +99,30 @@ class spatype():
         Change format of genome sequences to use as input for match_spa_ends func.
         Outputs a temporary file saco.tab.
         """
+        print("# Running saco convert")
+        print("#")
         with open(outdir + "/saco.tab", "w") as out:
-            with open("GCA_001049595.1.fasta") as f:
+            with open(fasta_file) as f:
                 header = f.readline()[1:-1]
+                if not " " in header and "_" in header:
+                    id = header.split("_", maxsplit=1)[0]
+                    description = header.split("_", maxsplit=1)[1]
+                else:
+                    id = header.split(" ", maxsplit=1)[0]
+                    description = header.split(" ", maxsplit=1)[1]
                 seq = ""
                 for line in f:
                     if line.startswith(">"):
-                        (id, description) = header.split(" ", maxsplit = 1)
+                        if not " " in header and "_" in header:
+                            id = header.split("_", maxsplit=1)[0]
+                            description = header.split("_", maxsplit=1)[1]
+                        else:
+                            id = header.split(" ", maxsplit=1)[0]
+                            description = header.split(" ", maxsplit=1)[1]
                         out.write(id + "\t" + seq + "\t\t" + description + "\n")
-                        header = line[1:-1]
                         seq = ""
                         continue
                     seq += line[:-1]
-                # add last entry
-                (id, description) = header.split(" ", maxsplit = 1)
-                out.write(id + "\t" + seq + "\t\t" + description + "\n")
                 
     def get_repeats(self):
         """Extract spa type repeats and store in dict"""
@@ -256,7 +268,7 @@ if __name__ == "__main__":
                  "exist:" + db_path + "\n")  
     
     # Check existence of the spa files in database
-    spa_seq_file = "%s/spa_sequences.fna" % (args.databases)
+    spa_seq_file = "%sspa_sequences.fna" % (args.databases)
     if(not os.path.isfile(spa_seq_file)):
         sys.exit("spa sequence file not found at expected location: %s"%(spa_seq_file))
     spa_types_file = "%s/spa_types.txt" % (args.databases)
@@ -299,8 +311,8 @@ if __name__ == "__main__":
                                             results['orientation']))
 
         # Cleaning up tmp files and database
-        cmd = "rm " + outdir + "/*.tab"
-        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL).wait()
-        cmd = "rm seq_db.*"
-        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL).wait()
+        #cmd = "rm " + outdir + "/*.tab"
+        #proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL).wait()
+        #cmd = "rm seq_db.*"
+        #proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL).wait()
         print("spaTyper: Done")
