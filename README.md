@@ -5,17 +5,14 @@ spaTyper documentation
 
 The spaTyper service predicts the _Staphylococcus aureus_ spa type from genome sequences.
 
-
 ## Installation
-
-The following command 
 
 Setting up spaTyper
 ```bash
-# Go to wanted location for resfinder
+# Go to wanted location for spatyper
 cd /path/to/some/dir
 
-# Clone the latest version and enter the resfinder directory
+# Clone the latest version and enter the spatyper directory
 git clone https://git@bitbucket.org/genomicepidemiology/spatyper.git
 cd spatyper
 
@@ -30,9 +27,6 @@ cd /path/to/some/dir
 git clone https://bitbucket.org/genomicepidemiology/spatyper_db.git
 ```
 ### Dependencies:
-Depending on how you plan to run ResFinder BLAST and KMA can be optional.
-BLAST is used to analyse assemblies (ie. FASTA files).
-KMA is used to analyse read data (ie. FASTQ files).
 
 #### Python modules: CGECore
 To install the needed python modules you can use pip
@@ -83,18 +77,20 @@ optional arguments:
 A webserver implementing the method is available at the [link](http://www.genomicepidemiology.org/ "CGE website") and can be found here: <https://cge.cbs.dtu.dk/services/spatyper/>
 
 ## Citation
-When using the method please cite:
-
-Typing of methicillin-resistant Staphylococcus aureus in a university hospital setting using a novel software for spa-repeat determination and database management.
-Harmsen D., Claus H., Witte W., Rothgänger J., Claus H., Turnwald D., & Vogel U..  
-J. Clin. Microbiol. 2003. 41: 5442-5448.
-PMID: [link](https://pubmed.ncbi.nlm.nih.gov/14662923/ "14662923")
+When using the method and spaTyper database please cite:
 
 Comparing whole-genome sequencing with Sanger sequencing for spa typing of methicillin-resistant Staphylococcus aureus.
 Bartels MD, Petersen A, Worning P, Nielsen JB, Larner-Svensson H, Johansen HK, Andersen LP, Jarløv JO, Boye K, Larsen AR, Westh H.
 J. Clin. Microbiol. 2014. 52(12): 4305-8.
 PMID: [link](https://pubmed.ncbi.nlm.nih.gov/25297335/ "25297335")
-	
+
+Typing of methicillin-resistant Staphylococcus aureus in a university hospital setting using a novel software for spa-repeat determination and database management.
+Harmsen D., Claus H., Witte W., Rothgänger J., Claus H., Turnwald D., & Vogel U.
+J. Clin. Microbiol. 2003. 41: 5442-5448.
+PMID: [link](https://pubmed.ncbi.nlm.nih.gov/14662923/ "14662923")
+
+Please also add the following acknowledgement: 
+_"This publication made use of the spa typing website (http://www.spaserver.ridom.de/) that is developed by Ridom GmbH and curated by SeqNet.org (http://www.SeqNet.org/)."_
 
 ## References
 
