@@ -257,7 +257,7 @@ if __name__ == "__main__":
 
     # Check if valid blast path is provided
     if args.blastPath:
-        if not os.path.isdir(args.blastPath) or args.blastPath != "":
+        if not os.path.isdir(args.blastPath) and args.blastPath != "":
             sys.exit("No valid path to blast directory was provided. Use the -b flag to provide the path.")
         blast_path = args.blastPath
     
