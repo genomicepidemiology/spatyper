@@ -259,10 +259,13 @@ if __name__ == "__main__":
     if args.blastPath:
         if not os.path.isdir(args.blastPath) and args.blastPath != "":
             sys.exit("No valid path to blast directory was provided. Use the -b flag to provide the path.")
-        if args.blastPath != os.path.dirname(shutil.which("blastn")):
+        if not os.path.join(args.blastPath, "blastn"):
             sys.exit("No valid path to blast directory was provided. Use the -b flag to provide the path.")
-    if shutil.which("blastn") is None or shutil.which("makeblastdb") is None:
+    elif shutil.which("blastn") is None or shutil.which("makeblastdb") is None: # make else if so this is checked if args.blastn is not provided
         sys.exit("Blast tool does not exist. Use the -b flag to provide the path to the tools.")
+    else:
+        pass
+
     blast_path = args.blastPath
     
     # Check if valid database is provided
