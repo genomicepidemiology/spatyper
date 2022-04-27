@@ -47,7 +47,7 @@ class spatype():
             # Unzip file
             cmd = "gzip -d " + fasta_file
             subprocess.run(cmd, shell=True)
-            cmd = self.blast + "makeblastdb -in " + fasta_file.replace(".qz", "") + " -out seq_db -dbtype nucl"
+            cmd = self.blast + "makeblastdb -in " + fasta_file.replace(".gz", "") + " -out seq_db -dbtype nucl"
         else:
             cmd = self.blast + "makeblastdb -in " + fasta_file + " -out seq_db -dbtype nucl"
         print("# Building sequence database")
@@ -230,7 +230,7 @@ if __name__ == "__main__":
     parser.add_argument("-db", "--databases",
                         help="Path to the directory containing the database with\
                               the spa sequences.",
-                        default="spatyper_db")
+                        default="spatyper_db/")
     parser.add_argument("-b", "--blastPath",
                         help="Path to blast directory",
                         default="")
@@ -259,7 +259,11 @@ if __name__ == "__main__":
     if args.blastPath:
         if not os.path.isdir(args.blastPath) and args.blastPath != "":
             sys.exit("No valid path to blast directory was provided. Use the -b flag to provide the path.")
-        blast_path = args.blastPath
+        if args.blastPath != os.path.dirname(shutil.which("blastn")):
+            sys.exit("No valid path to blast directory was provided. Use the -b flag to provide the path.")
+    if shutil.which("blastn") is None or shutil.which("makeblastdb") is None:
+        sys.exit("Blast tool does not exist. Use the -b flag to provide the path to the tools.")
+    blast_path = args.blastPath
     
     # Check if valid database is provided
     if args.databases:
