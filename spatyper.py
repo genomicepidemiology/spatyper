@@ -39,7 +39,7 @@ class spatype():
 
     def __init__(self, spa_seq_file, blast_path):
         self.spa_file = spa_seq_file
-        self.blastn = blast_path
+        self.blast = blast_path
         
     def spa_database(self, fasta_file):
         """Builds BLAST database from genome sequences names seq_db."""
@@ -47,9 +47,9 @@ class spatype():
             # Unzip file
             cmd = "gzip -d " + fasta_file
             subprocess.run(cmd, shell=True)
-            cmd = "makeblastdb -in " + fasta_file[:-3] + " -out seq_db -dbtype nucl"
+            cmd = self.blast + "makeblastdb -in " + fasta_file.replace(".qz", "") + " -out seq_db -dbtype nucl"
         else:
-            cmd = "makeblastdb -in " + fasta_file + " -out seq_db -dbtype nucl"
+            cmd = self.blast + "makeblastdb -in " + fasta_file + " -out seq_db -dbtype nucl"
         print("# Building sequence database")
         print("#")
         print("# BLAST call: " + cmd)
@@ -62,7 +62,7 @@ class spatype():
         BLAST spa sequences against genome sequences database (seq_db).
         Outputs a temporary tabular blastn_out.tab with all all spatype alignments.
         """
-        cmd = "blastn -query " + self.spa_file + " -db seq_db -out " + outdir + "/blastn_out.tab -outfmt 7 -dust no -evalue 0.0001 -num_alignments 10000"
+        cmd = self.blast + "blastn -query " + self.spa_file + " -db seq_db -out " + outdir + "/blastn_out.tab -outfmt 7 -dust no -evalue 0.0001 -num_alignments 10000"
 
         print("# Blasting query against sequence database")
         print("#")
@@ -231,12 +231,12 @@ if __name__ == "__main__":
                         help="Path to the directory containing the database with\
                               the spa sequences.",
                         default="spatyper_db")
+    parser.add_argument("-b", "--blastPath",
+                        help="Path to blast directory",
+                        default="")
     parser.add_argument("-o", "--outdir",
                         help="Output directory.",
                         default="")
-    parser.add_argument("-b", "--blastPath",
-                        help="Path to blastn",
-                        default='blastn')
     parser.add_argument("-v", "--version", action="version", version=version_numb)
     args = parser.parse_args()
     
@@ -256,9 +256,10 @@ if __name__ == "__main__":
        outdir = os.getcwd()
 
     # Check if valid blast path is provided
-    if shutil.which(args.blastPath) is None:
-        sys.exit("No valid path to blastn was provided. Use the -b flag to provide the path.")
-    blast_path = args.blastPath
+    if args.blastPath:
+        if not os.path.isdir(args.blastPath) or args.blastPath != "":
+            sys.exit("No valid path to blast directory was provided. Use the -b flag to provide the path.")
+        blast_path = args.blastPath
     
     # Check if valid database is provided
     if args.databases:
