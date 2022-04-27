@@ -1,4 +1,4 @@
-#!/usr/bin/gawk -f
+#!/usr/bin/env gawk -f
 # spa_type.find2.gawk
 #
 # Script that reads in a blast.txt, query.tab (the genome sequence) 
