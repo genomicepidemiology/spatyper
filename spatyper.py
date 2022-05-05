@@ -104,22 +104,11 @@ class spatype():
         with open(outdir + "/saco.tab", "w") as out:
             with open(fasta_file) as f:
                 header = f.readline()[1:-1]
-                if not " " in header and "_" in header:
-                    id = header.split("_", maxsplit=1)[0]
-                    description = header.split("_", maxsplit=1)[1]
-                else:
-                    id = header.split(" ", maxsplit=1)[0]
-                    description = header.split(" ", maxsplit=1)[1]
                 seq = ""
                 for line in f:
                     if line.startswith(">"):
-                        if not " " in header and "_" in header:
-                            id = header.split("_", maxsplit=1)[0]
-                            description = header.split("_", maxsplit=1)[1]
-                        else:
-                            id = header.split(" ", maxsplit=1)[0]
-                            description = header.split(" ", maxsplit=1)[1]
-                        out.write(id + "\t" + seq + "\t\t" + description + "\n")
+                        header = line[1:-1]
+                        out.write(header + "\t" + seq + "\t\t\n")
                         seq = ""
                         continue
                     seq += line[:-1]
