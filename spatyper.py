@@ -209,7 +209,7 @@ if __name__ == "__main__":
                         default="")
     parser.add_argument("-no_tmp", "--remove_tmp",
                         help="Remove temporary files after run. Default=True.",
-                        choices=["T", "F"]
+                        choices=["T", "F"],
                         default=True)
     parser.add_argument("-v", "--version", action="version", version=version_numb)
     args = parser.parse_args()
