@@ -99,8 +99,6 @@ class spatype():
         Change format of genome sequences to use as input for match_spa_ends func.
         Outputs a temporary file saco.tab.
         """
-        print("# Running saco convert")
-        print("#")
         with open(outdir + "/saco.tab", "w") as out:
             with open(fasta_file) as f:
                 header = f.readline()[1:-1]
@@ -130,6 +128,7 @@ class spatype():
         Returns a dict with all values for outfile with results.
         """
         cmd = "./spa_type.find.gawk {o}/hits.tab {o}/saco.tab > {o}/res.tab".format(o=outdir)
+        print("# Matching spa ends")
         print("#")
         print("# Call: " + cmd)
         print("#")
@@ -209,8 +208,8 @@ if __name__ == "__main__":
                         default="")
     parser.add_argument("-no_tmp", "--remove_tmp",
                         help="Remove temporary files after run. Default=True.",
-                        choices=["T", "F"],
-                        default=True)
+                        choices=["True", "False"],
+                        default="True")
     parser.add_argument("-v", "--version", action="version", version=version_numb)
     args = parser.parse_args()
     
@@ -224,8 +223,8 @@ if __name__ == "__main__":
     # Check if valid output directory is provided
     if args.outdir:
         outdir = os.path.abspath(args.outdir)
-        if not os.path.exists(args.outdir):
-            sys.exit("Input Error: Output dirctory does not exists:" + outdir + "\n")
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
     else:
        outdir = os.getcwd()
 
@@ -313,7 +312,7 @@ if __name__ == "__main__":
                                             results['orientation']))
 
         # Cleaning tmp files
-        if args.remove_tmp is True:
+        if args.remove_tmp == "True":
             cmd = "rm " + outdir + "/*.tab"
             proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL).wait()
             cmd = "rm seq_db.*"
