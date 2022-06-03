@@ -29,19 +29,29 @@ git clone https://bitbucket.org/genomicepidemiology/spatyper_db.git
 ### Dependencies:
 
 #### Python modules: CGECore
-To install the needed python modules you can use pip
+To install the needed python modules you can use pip. 
 ```bash
 pip3 install cgecore
 ```
-For more information visit the respective website
+For more information visit the respective website:
 ```url
 https://bitbucket.org/genomicepidemiology/cge_core_module
+```
+
+#### Gawk
+To install gawk with Linux/Unix Homebrew can be used.
+```bash
+brew install gawk
+```
+For Windows users please see:
+```url
+http://gnuwin32.sourceforge.net/packages/gawk.htm
 ```
 
 #### BLAST
 spaTyper requires blastn. 
 Note, if you don't want to specify the path of blastn every time you run
-ResFinder, make sure that blastn is in you PATH.
+spaTyper, make sure that blastn is in you PATH.
 
 Blastn can be obtained from:
 ```url
