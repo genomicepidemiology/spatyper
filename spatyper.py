@@ -99,31 +99,19 @@ class spatype():
         Change format of genome sequences to use as input for match_spa_ends func.
         Outputs a temporary file saco.tab.
         """
-        print("# Running saco convert")
-        print("#")
         with open(outdir + "/saco.tab", "w") as out:
             with open(fasta_file) as f:
                 header = f.readline()[1:-1]
-                if not " " in header and "_" in header:
-                    id = header.split("_", maxsplit=1)[0]
-                    description = header.split("_", maxsplit=1)[1]
-                else:
-                    id = header.split(" ", maxsplit=1)[0]
-                    description = header.split(" ", maxsplit=1)[1]
                 seq = ""
                 for line in f:
                     if line.startswith(">"):
-                        if not " " in header and "_" in header:
-                            id = header.split("_", maxsplit=1)[0]
-                            description = header.split("_", maxsplit=1)[1]
-                        else:
-                            id = header.split(" ", maxsplit=1)[0]
-                            description = header.split(" ", maxsplit=1)[1]
-                        out.write(id + "\t" + seq + "\t\t" + description + "\n")
+                        out.write(header + "\t" + seq + "\t\t\n")
+                        header = line[1:-1]
                         seq = ""
                         continue
                     seq += line[:-1]
-                
+                out.write(header + "\t" + seq + "\t\t\n")
+
     def get_repeats(self):
         """Extract spa type repeats and store in dict"""
         spa_type_repeats = {}
@@ -139,34 +127,14 @@ class spatype():
         Executes spa_type.find.gawk machting the the 5' and 3' ends of the reads.
         Returns a dict with all values for outfile with results.
         """
-        cmd = os.path.realpath("spa_type.find.gawk") + " " + outdir + "/hits.tab" + " " + outdir + "/saco.tab > " + outdir +"/res.tab"
+        cmd = "./spa_type.find.gawk {o}/hits.tab {o}/saco.tab > {o}/res.tab".format(o=outdir)
+        print("# Matching spa ends")
         print("#")
         print("# Call: " + cmd)
         print("#")
-        proc = subprocess.Popen(cmd, shell=True).wait()
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
         print("Call ended")
-        
-        # Fetch the results from the spaTyper
-        results = {
-            'spa_type':    'unknown',
-            'repeats':     '',
-            'contig':      'N/A',
-            'position':    '',
-            'orientation': 'N/A'
-            }
-        # Load spa repeat db
-        spa_type_repeats_dict = spa.get_repeats()
-        with open(outdir +"/res.tab") as f:
-            for l in f:
-                if l[:5] == 'Bingo':
-                    tmp = l.split('\t')
-                    results['spa_type']    = tmp[1].split('_')[1].strip()
-                    results['repeats'] = spa_type_repeats_dict.get(tmp[1].split('_')[1].strip())
-                    results['contig']      = tmp[2].strip()
-                    results['position']    = tmp[3].split(':')[1].strip()
-                    results['orientation'] = tmp[4].strip()
-        return results
-
+    
 def is_gzipped(file_path):
     """ Returns True if file is gzipped and False otherwise.
 
@@ -225,6 +193,7 @@ if __name__ == "__main__":
     
     parser.add_argument("-i", "--inputfile",
                         help="FASTA files are accepted. Can be whole genome or contigs.",
+                        required=True,
                         default=None)
     # Optional arguments
     parser.add_argument("-db", "--databases",
@@ -237,6 +206,10 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--outdir",
                         help="Output directory.",
                         default="")
+    parser.add_argument("-no_tmp", "--remove_tmp",
+                        help="Remove temporary files after run. Default=True.",
+                        choices=["True", "False"],
+                        default="True")
     parser.add_argument("-v", "--version", action="version", version=version_numb)
     args = parser.parse_args()
     
@@ -250,8 +223,8 @@ if __name__ == "__main__":
     # Check if valid output directory is provided
     if args.outdir:
         outdir = os.path.abspath(args.outdir)
-        if not os.path.exists(args.outdir):
-            sys.exit("Input Error: Output dirctory does not exists:" + outdir + "\n")
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
     else:
        outdir = os.getcwd()
 
@@ -261,11 +234,10 @@ if __name__ == "__main__":
             sys.exit("No valid path to blast directory was provided. Use the -b flag to provide the path.")
         if not os.path.join(args.blastPath, "blastn"):
             sys.exit("No valid path to blast directory was provided. Use the -b flag to provide the path.")
-    elif shutil.which("blastn") is None or shutil.which("makeblastdb") is None: # make else if so this is checked if args.blastn is not provided
+    elif shutil.which("blastn") is None or shutil.which("makeblastdb") is None:
         sys.exit("Blast tool does not exist. Use the -b flag to provide the path to the tools.")
     else:
         pass
-
     blast_path = args.blastPath
     
     # Check if valid database is provided
@@ -307,8 +279,29 @@ if __name__ == "__main__":
         spa.find_spatype()
         spa.filter_spatype()
         spa.saco_convert(fasta)
-        results = spa.match_spa_ends()
+        spa.match_spa_ends()
         
+
+        # Fetch the results from the spaTyper
+        results = {
+            'spa_type':    'unknown',
+            'repeats':     '',
+            'contig':      'N/A',
+            'position':    '',
+            'orientation': 'N/A'
+            }
+        # Load spa repeat db
+        spa_type_repeats_dict = spa.get_repeats()
+        with open(outdir +"/res.tab") as f:
+            for l in f:
+                if l[:5] == 'Bingo':
+                    tmp = l.split('\t')
+                    results['spa_type']    = tmp[1].split('_')[1].strip()
+                    results['repeats'] = spa_type_repeats_dict.get(tmp[1].split('_')[1].strip())
+                    results['contig']      = tmp[2].strip()
+                    results['position']    = tmp[3].split(':')[1].strip()
+                    results['orientation'] = tmp[4].strip()
+
         # Create results file
         tsv = os.path.join(outdir + "/spaType_results.tsv")
         with open(tsv, "w") as f:
@@ -318,9 +311,10 @@ if __name__ == "__main__":
                                             results['contig'], results['position'],
                                             results['orientation']))
 
-        # Cleaning up tmp files and database
-        #cmd = "rm " + outdir + "/*.tab"
-        #proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL).wait()
-        #cmd = "rm seq_db.*"
-        #proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL).wait()
+        # Cleaning tmp files
+        if args.remove_tmp == "True":
+            cmd = "rm " + outdir + "/*.tab"
+            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL).wait()
+            cmd = "rm seq_db.*"
+            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL).wait()
         print("spaTyper: Done")

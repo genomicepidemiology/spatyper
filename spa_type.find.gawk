@@ -1,5 +1,6 @@
-#!/usr/bin/env gawk -f
-# spa_type.find2.gawk
+#!/usr/bin/env -S gawk -f
+#
+# spa_type.find.gawk
 #
 # Script that reads in a blast.txt, query.tab (the genome sequence) 
 # the blast search is made from the query.tab plus a database made 
@@ -57,7 +58,7 @@ END{
 	    seq = substr(qseq[qname[i]],qpos2[i]-29,11); # 5' sequence
             end5seq[i] = "";
             for(j=1;j<=length(seq);j++) end5seq[i] = com[substr(seq,j,1)] end5seq[i];
-	    seq = substr(qseq[qname[i]],qpos1[i]+1,9); # 3' sequenceCA[AC]CAAAA
+	    seq = substr(qseq[qname[i]],qpos1[i]+1,9); # 3' sequence
             end3seq[i] = "";
             for(j=1;j<=length(seq);j++) end3seq[i] = com[substr(seq,j,1)] end3seq[i];
         }

@@ -1,8 +1,6 @@
 spaTyper documentation
 =============
 
-**This service is under construction**
-
 The spaTyper service predicts the _Staphylococcus aureus_ spa type from genome sequences.
 
 ## Installation
@@ -80,7 +78,9 @@ optional arguments:
                         Output directory.
   -b BLASTPATH, --blastPath BLASTPATH
                         Path to blastn
-  --version             Show program's version number and exit
+  -no_tmp {T,F}, --remove_tmp {T,F}
+                        Remove temporary files after run. Default=True.
+  -v, --version         show program's version number and exit
 ```
 
 ## Web-server
