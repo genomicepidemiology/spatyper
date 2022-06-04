@@ -66,19 +66,19 @@ You can run spaTyper command line using python3.
 python3 spatyper.py -i /path/to/isolate.fa.gz -db /path/to/spatyper_db/ -o /path/to/outdir
 
 # The program can be invoked with the -h option
-usage: spatyper.py [-h] [-i INPUTFILE] [-db DATABASES] [-o OUTDIR] [-b BLASTPATH] [--version]
+usage: spatyper.py [-h] -i INPUTFILE [-db DATABASES] [-b BLASTPATH] [-o OUTDIR] [-no_tmp {True,False}] [-v]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -i INPUTFILE, --inputfile INPUTFILE
                         FASTA files are accepted. Can be whole genome or contigs.
   -db DATABASES, --databases DATABASES
                         Path to the directory containing the database with the spa sequences.
+  -b BLASTPATH, --blastPath BLASTPATH
+                        Path to blast directory
   -o OUTDIR, --outdir OUTDIR
                         Output directory.
-  -b BLASTPATH, --blastPath BLASTPATH
-                        Path to blastn
-  -no_tmp {T,F}, --remove_tmp {T,F}
+  -no_tmp {True,False}, --remove_tmp {True,False}
                         Remove temporary files after run. Default=True.
   -v, --version         show program's version number and exit
 ```
