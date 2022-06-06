@@ -7,7 +7,7 @@ Contributors:
 K. Therkelsen
 
 """
-version_numb = "v2.0.0"
+version_numb = "v1.0.0"
 
 # imports
 import os, sys, shutil, subprocess, gzip, re
