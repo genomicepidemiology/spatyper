@@ -36,16 +36,6 @@ For more information visit the respective website:
 https://bitbucket.org/genomicepidemiology/cge_core_module
 ```
 
-#### Gawk
-To install gawk with Linux/Unix Homebrew can be used.
-```bash
-brew install gawk
-```
-For Windows users please see:
-```url
-http://gnuwin32.sourceforge.net/packages/gawk.htm
-```
-
 #### BLAST
 spaTyper requires blastn. 
 Note, if you don't want to specify the path of blastn every time you run

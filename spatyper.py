@@ -10,7 +10,7 @@ K. Therkelsen
 version_numb = "v2.0.0"
 
 # imports
-import os, sys, shutil, subprocess, gzip
+import os, sys, shutil, subprocess, gzip, re
 from argparse import ArgumentParser
 
 # for help
@@ -122,18 +122,49 @@ class spatype():
                 spa_type_repeats[type] = tmp[1].strip()
         return spa_type_repeats
 
+    def revcomp(self,seq):
+        """Reverse complements as string of DNA"""
+        reverse_comp_table = str.maketrans("ATCGN", "TAGCN")
+        complement_dna = seq.translate(reverse_comp_table)
+        return complement_dna
+
     def match_spa_ends(self):
-        """
-        Executes spa_type.find.gawk machting the the 5' and 3' ends of the reads.
-        Returns a dict with all values for outfile with results.
-        """
-        cmd = "./spa_type.find.gawk {o}/hits.tab {o}/saco.tab > {o}/res.tab".format(o=outdir)
-        print("# Matching spa ends")
-        print("#")
-        print("# Call: " + cmd)
-        print("#")
-        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-        print("Call ended")
+        spa_DB = dict()
+        with open(outdir + "/saco.tab", "r") as saco:
+            for line in saco:
+                line=line.split("\t")
+                contig = line[0].split()[0]
+                spa_DB[contig] = line[1]
+
+        with open(outdir + "/res.tab", "w") as res:
+            with open(outdir + "/hits.tab", "r") as blast_hits:
+                for line in blast_hits:
+                    
+                    line = line[:-1].split("\t")
+                    bname = line[0].split("_")[1]
+                    qname = line[1] # has the repeats, in a list?
+                    if qname in spa_DB:
+                        qseq = spa_DB.get(qname)
+                    
+                    qpos1 = int(line[8])
+                    qpos2 = int(line[9])
+                    orien = "plus"
+                    if qpos1 > qpos2:
+                        orien = "minus"
+                    if orien == "plus":
+                        pos1 = qpos1-10
+                        pos2 = qpos2+29
+                        end5seq = qseq[pos2-10:pos2].upper()   # 5' sequence
+                        end3seq = qseq[pos1:qpos1-1].upper()   # 3' sequence
+                    elif orien == "minus":
+                        pos1 = qpos2-30
+                        pos2 = qpos1+9
+                        seq = qseq[pos1:pos1+10].upper()
+                        end5seq = ''.join(reversed(spa.revcomp(seq)))  # 5' sequence
+                        seq = qseq[qpos1:pos2].upper()
+                        end3seq = ''.join(reversed(spa.revcomp(seq))) # 3' sequence
+                    if re.search(r"TA[CT]ATGTCGT", end5seq) and re.search(r"[GA]CA[AC]CAAAA", end3seq):
+                        res.write("Bingo\t{}\t{}\tposition:{}-{}\t{}\n".format(bname,qname,pos1,pos2,orien))
     
 def is_gzipped(file_path):
     """ Returns True if file is gzipped and False otherwise.
@@ -296,8 +327,8 @@ if __name__ == "__main__":
             for l in f:
                 if l[:5] == 'Bingo':
                     tmp = l.split('\t')
-                    results['spa_type']    = tmp[1].split('_')[1].strip()
-                    results['repeats'] = spa_type_repeats_dict.get(tmp[1].split('_')[1].strip())
+                    results['spa_type']    = tmp[1]
+                    results['repeats'] = spa_type_repeats_dict.get(tmp[1])
                     results['contig']      = tmp[2].strip()
                     results['position']    = tmp[3].split(':')[1].strip()
                     results['orientation'] = tmp[4].strip()
